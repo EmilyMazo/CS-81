@@ -45,7 +45,8 @@ def search_tweets(bt, query, count=50):
 
     data = urlencode({
         "count": count,
-        "q": query + " -RT"
+        "q": query + " -RT",
+        "lang": "en"
     })
     headers = {
         'Connection': 'keep-alive',
@@ -73,24 +74,27 @@ def get_next_results(bt, next_results):
 
 def get_tweets(bt, query, per_page=5):
     i = 1
-    cur_result = convert_result(search_tweets(bt, "trump", count=per_page))
+    cur_result = convert_result(search_tweets(bt, "Clinton", count=per_page))
     print "Got page %d..." % i
 
     all_statuses = cur_result["statuses"]
     
-    while True:
-        try:
-            next_results = cur_result["metadata"]["next_results"]
-        except:
-            print "Ran out of statuses."
-            break
+    try:
+        while True:
+            try:
+                next_results = cur_result["metadata"]["next_results"]
+            except:
+                print "Ran out of statuses."
+                break
 
-        cur_result = convert_result(get_next_results(bt, next_results))
+            cur_result = convert_result(get_next_results(bt, next_results))
 
-        i += 1
-        print "Got page %d..." % i
+            i += 1
+            print "Got page %d..." % i
 
-        all_statuses.extend(cur_result["statuses"])
+            all_statuses.extend(cur_result["statuses"])
+    except KeyboardInterrupt:
+        pass
 
     return all_statuses
 
